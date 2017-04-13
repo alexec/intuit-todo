@@ -9,3 +9,7 @@ Part I: Build a simple client side Todo web application (no backend) using any J
 With the following conditions
 
 1.    Expose the todos data on the browser console such that todos.add({title:”something”, done:”true”} will automatically update the board on the browser.
+
+# Assumptions
+
+Nothing has been stated regarding non-functional or browser compatibility requirements.
