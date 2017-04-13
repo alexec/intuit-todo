@@ -1,106 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title>TODO</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-<style type="text/css">
-  #items ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  #items li.done {
-    color: gray;
-  }
-</style>
+    <title>TODO</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <style type="text/css">
+        #items ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        #items li.done {
+            color: gray;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
-      <p>
-        <span id="summary">Loading...</span>
-        <select class="select" onClick="for (var i = 0; i < this.options.length; i++) {if (this.options[i].selected) {todos.filter(this.options[i].value);}}">
-          <option value="">-</option>
-          <option value="pending">Pending</option>
-          <option value="done">Done</option>
-        </select>
-      </p>
-      <div id="items"></div>
-      <p>
-      <input class="input" placeholder="New item + enter" name="item" onKeyUp="if (this.value !== '' &amp;&amp; event.keyCode === 13) {todos.add({'title': this.value});this.value='';}">
-    </p>
+        <p>
+            <span id="summary">Loading...</span>
+            <select class="select" onClick="for (var i = 0; i < this.options.length; i++) {if (this.options[i].selected) {todos.filter(this.options[i].value);}}">
+        <option value="">-</option>
+        <option value="pending">Pending</option>
+        <option value="done">Done</option>
+      </select>
+        </p>
+        <div id="items"></div>
+        <p>
+            <input class="input" placeholder="New item + enter" name="item" onKeyUp="if (this.value !== '' &amp;&amp; event.keyCode === 13) {todos.add({'title': this.value});this.value='';}">
+        </p>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-      <script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
         var todos = {
-          "init": function(items) {
-            this.items = JSON.parse(localStorage.items || "[]");
-          },
-          "_id": function() {
-            return new Date().getTime()
-          },
-          "add": function(options) {
-              var title = options.title || "";
-              if (title == "") {
-                throw new Error("title blank");
-              }
-              var done = options.done === true || options.done === "true"; // allows for string "true" as well as boolean
-              this.items.push({"id": this._id(), "title": title, "done": done});
-              localStorage.items = JSON.stringify(this.items);
-              this.render();
-          },
-          "toggleState": function(id) {
-            for (var i = 0; i < this.items.length; i++) {
-              var item = this.items[i];
-              if (item.id === id) {
-                item.done = !item.done;
-                break;
-              }
-             }
-             localStorage.items = JSON.stringify(this.items);
-             this.render();
-          },
-          "filter": function(state) {
-            localStorage.filter = state;
-            this.render();
-          },
-          "_items2html": function() {
-            var h = '<ul>';
-            var filter = localStorage.filter || "";
-            console.log(filter);
-            for (var i = 0; i < this.items.length; i++) {
-              var item = this.items[i];
-              var state = (item.done === true ? "done" : "pending");
-              if (filter === "" || filter === state) {
-               h  += "<li class='" + state + "' onClick='todos.toggleState(" +item.id + ")'>"
-                + "<i class='glyphicon glyphicon-" + (item.done === true ? "check" : "unchecked") + "'></i> "
-                + item.title
-                + "</li>";
-              }
-             }
-             h += "</ul>";
-             return h;
-          },
-          "_countDone": function() {
-            var c = 0;
-            for (var i = 0; i < this.items.length; i++) {
-               c += this.items[i].done;
-             }
-            return c;
-          },
-          "render": function() {
-            $("#summary").html(this.items.length + " items(s), " + this._countDone() + " done")
-            $("#items").html(this._items2html());
-          }
+            "init": function(items) {
+                this.items = JSON.parse(localStorage.items || "[]");
+            },
+            "_id": function() {
+                return new Date().getTime()
+            },
+            "add": function(options) {
+                var title = options.title || "";
+                if (title == "") {
+                    throw new Error("title blank");
+                }
+                var done = options.done === true || options.done === "true"; // allows for string "true" as well as boolean
+                this.items.push({
+                    "id": this._id(),
+                    "title": title,
+                    "done": done
+                });
+                localStorage.items = JSON.stringify(this.items);
+                this.render();
+            },
+            "toggleState": function(id) {
+                for (var i = 0; i < this.items.length; i++) {
+                    var item = this.items[i];
+                    if (item.id === id) {
+                        item.done = !item.done;
+                        break;
+                    }
+                }
+                localStorage.items = JSON.stringify(this.items);
+                this.render();
+            },
+            "filter": function(state) {
+                localStorage.filter = state;
+                this.render();
+            },
+            "_items2html": function() {
+                var h = '<ul>';
+                var filter = localStorage.filter || "";
+                for (var i = 0; i < this.items.length; i++) {
+                    var item = this.items[i];
+                    var state = (item.done === true ? "done" : "pending");
+                    if (filter === "" || filter === state) {
+                        h += "<li class='" + state + "' onClick='todos.toggleState(" + item.id + ")'>" +
+                            "<i class='glyphicon glyphicon-" + (item.done === true ? "check" : "unchecked") + "'></i> " +
+                            item.title +
+                            "</li>";
+                    }
+                }
+                h += "</ul>";
+                return h;
+            },
+            "_countDone": function() {
+                var c = 0;
+                for (var i = 0; i < this.items.length; i++) {
+                    c += this.items[i].done;
+                }
+                return c;
+            },
+            "render": function() {
+                $("#summary").html(this.items.length + " items(s), " + this._countDone() + " done")
+                $("#items").html(this._items2html());
+            }
         };
 
         todos.init();
         todos.render();
-
-      </script>
+    </script>
 </body>
+
 </html>
