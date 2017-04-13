@@ -20,7 +20,14 @@
 </head>
 <body>
     <div class="container">
-      <p id="summary">Loading...</p>
+      <p>
+        <span id="summary">Loading...</span>
+        <select class="select" onClick="for (var i = 0; i < this.options.length; i++) {if (this.options[i].selected) {todos.filter(this.options[i].value);}}">
+          <option value="">-</option>
+          <option value="pending">Pending</option>
+          <option value="done">Done</option>
+        </select>
+      </p>
       <div id="items"></div>
       <p>
       <input class="input" placeholder="New item + enter" name="item" onKeyUp="if (this.value !== '' &amp;&amp; event.keyCode === 13) {todos.add({'title': this.value});this.value='';}">
@@ -57,14 +64,23 @@
              localStorage.items = JSON.stringify(this.items);
              this.render();
           },
+          "filter": function(state) {
+            localStorage.filter = state;
+            this.render();
+          },
           "_items2html": function() {
             var h = '<ul>';
+            var filter = localStorage.filter || "";
+            console.log(filter);
             for (var i = 0; i < this.items.length; i++) {
               var item = this.items[i];
-               h  += "<li class='" + (item.done === true ? "done" : "pending") + "' onClick='todos.toggleState(" +item.id + ")'>"
+              var state = (item.done === true ? "done" : "pending");
+              if (filter === "" || filter === state) {
+               h  += "<li class='" + state + "' onClick='todos.toggleState(" +item.id + ")'>"
                 + "<i class='glyphicon glyphicon-" + (item.done === true ? "check" : "unchecked") + "'></i> "
                 + item.title
                 + "</li>";
+              }
              }
              h += "</ul>";
              return h;
